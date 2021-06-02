@@ -56,10 +56,41 @@ class Piece {
     this.blocks[3] = new Point(this.x, this.y, 0, 1, 1);
   }
   
+  private void makeL1() {
+    this.blocks[0] = new Point(this.x, this.y, -1, 1, 1);
+    this.blocks[1] = new Point(this.x, this.y, 0, 1, 1);
+    this.blocks[2] = new Point(this.x, this.y, 0, 0, 1);
+    this.blocks[3] = new Point(this.x, this.y, 0, -1, 1);
+  }
+  
+  private void makeL2() {
+    this.blocks[0] = new Point(this.x, this.y, 1, 1, 1);
+    this.blocks[1] = new Point(this.x, this.y, 0, 1, 1);
+    this.blocks[2] = new Point(this.x, this.y, 0, 0, 1);
+    this.blocks[3] = new Point(this.x, this.y, 0, -1, 1);
+  }
+  
+  private void makeBox() {
+    this.blocks[0] = new Point(this.x, this.y, -1, 1, 1);
+    this.blocks[1] = new Point(this.x, this.y, 1, 1, 1);
+    this.blocks[2] = new Point(this.x, this.y, -1, -1, 1);
+    this.blocks[3] = new Point(this.x, this.y, 1, -1, 1);
+  }
+  
   private void generateBlocks() {
     switch (this.shape) {
       case 1:
         makeT();
+        break;
+      case 2:
+        makeL1();
+        break;
+      case 3:
+        makeL2();
+        break;
+      case 4:
+        makeBox();
+        break;
     }
   }
   
@@ -100,7 +131,7 @@ void setup() {
     board[c][0] = 1;
   }
   
-  currentBlock = new Piece(3, 15, 1);
+  currentBlock = new Piece(3, 15, 2);
 }
 
 void draw() {
