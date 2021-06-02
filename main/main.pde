@@ -5,16 +5,47 @@ int cs = cellsize;
 Point[] currentBlock = new Point[5];
 
 class Point {
+  int ox, oy;
   int x, y;
   int type;
   
-  Point(int x, int y) {
+  Point(int ox, int oy, int x, int y, int type) {
+    this.ox = ox;
+    this.oy = oy;
     this.x = x;
     this.y = y;
+    this.type = type;
   }
   
   boolean canFall() {
     return board[this.x][this.y-1] == 0;
+  }
+}
+
+class Piece {
+  int x, y;
+  Point[] blocks;
+  int shape;
+  
+  Piece(int x, int y, int shape) {
+    this.x = x;
+    this.y = y;
+    this.shape = shape;
+    this.blocks = new Point[5];
+    generateBlocks();
+  }
+  
+  private void makeT() {
+    this.blocks[0] = new Point(this.x, this.y, -1, 0, 1);
+    this.blocks[1] = new Point(this.x, this.y, 1, 0, 1);
+    this.blocks[2] = new Point(this.x, this.y, 0, 0, 1);
+    this.blocks[3] = new Point(this.x, this.y, 0, 1, 1);
+  }
+  
+  private void generateBlocks() {
+    switch (this.shape) {
+      case 1:
+        makeT();
   }
 }
 
