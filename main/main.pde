@@ -127,9 +127,13 @@ void draw() {
           break;
       }
       rect(r*cs, 900-c*cs, cs, cs);
+    }
+  }
       
-      currentBlock.draw();
-      
+  currentBlock.draw();
+  
+  for (int r=0; r<board.length; r++) {
+    for (int c=0; c<board[r].length; c++) {
       stroke(100, 100, 100);
       noFill();
       rect(r*cs, 900-c*cs, cs, cs);
