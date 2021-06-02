@@ -14,7 +14,7 @@ Piece currentBlock;
 
 class Point {
   int ox, oy;
-  int x, y;
+  private int x, y;
   int type;
   
   Point(int ox, int oy, int x, int y, int type) {
@@ -25,14 +25,20 @@ class Point {
     this.type = type;
   }
   
+  int x() {
+    return ox + x;
+  }
+  
+  int y() {
+    return oy + y;
+  }
+  
   boolean canFall() {
-    return board[this.x][this.y-1] == 0;
+    return this.y() != 0 && board[this.x()][this.y()-1] == 0;
   }
   
   void draw() {
-    int x = this.ox + this.x;
-    int y = this.oy + this.y;
-    rect(x*cs, 900-y*cs, cs, cs);
+    rect(this.x()*cs, 900-this.y()*cs, cs, cs);
   }
 }
 
@@ -93,6 +99,34 @@ class Piece {
         break;
     }
   }
+    
+  private void makeStatic() {
+    for (Point p : blocks)
+      if (p != null)
+        board[p.x()][p.y()] = p.type;
+  }
+  
+  void fall() {
+    boolean willStatic = false;
+    
+    for (Point p : blocks) {
+      if (p != null && !p.canFall())
+        willStatic = true;
+    }
+    
+    if (willStatic) {
+      makeStatic();
+      currentBlock = new Piece(3, 15, 2);
+      println("static");
+    } else {
+      for (Point p : blocks) {
+        if (p != null) {
+          p.oy--;
+        }
+      }
+      println("not static");
+    }
+  }
   
   void draw() {
     switch (shape) {
@@ -132,6 +166,13 @@ void setup() {
   }
   
   currentBlock = new Piece(3, 15, 2);
+}
+
+void keyReleased() {
+  if (key == CODED && keyCode == DOWN) {
+    println("hai");
+    currentBlock.fall();
+  }
 }
 
 void draw() {
