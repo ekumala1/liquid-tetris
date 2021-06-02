@@ -1,8 +1,16 @@
+//-----------------------------------------------
+//GAME VARIABLES
+//-----------------------------------------------
 int[][] board = new int[10][20];
 int cellsize = 40;
+color type1 = color(75, 0, 0);
+color type2 = color(0, 75, 0);
+color type3 = color(0, 0, 75);
+color type4 = color(75, 0, 75);
+//-----------------------------------------------
 
 int cs = cellsize;
-Point[] currentBlock = new Point[5];
+Piece currentBlock;
 
 class Point {
   int ox, oy;
@@ -19,6 +27,12 @@ class Point {
   
   boolean canFall() {
     return board[this.x][this.y-1] == 0;
+  }
+  
+  void draw() {
+    int x = this.ox + this.x;
+    int y = this.oy + this.y;
+    rect(x*cs, 900-y*cs, cs, cs);
   }
 }
 
@@ -46,6 +60,31 @@ class Piece {
     switch (this.shape) {
       case 1:
         makeT();
+    }
+  }
+  
+  void draw() {
+    switch (shape) {
+      case 0:
+        fill(255, 255, 255);
+        break;
+      case 1:
+        fill(type1);
+        break;
+      case 2:
+        fill(type2);
+        break;
+      case 3:
+        fill(type3);
+        break;
+      case 4:
+        fill(type4);
+        break;
+    }
+    for (Point block : blocks) {
+      if (block != null)
+        block.draw();
+    }
   }
 }
 
@@ -60,6 +99,8 @@ void setup() {
   for (int c=0; c<board.length; c++) {
     board[c][0] = 1;
   }
+  
+  currentBlock = new Piece(3, 15, 1);
 }
 
 void draw() {
@@ -67,28 +108,30 @@ void draw() {
   
   for (int r=0; r<board.length; r++) {
     for (int c=0; c<board[r].length; c++) {
-      
       noStroke();
       switch (board[r][c]) {
         case 0:
           fill(255, 255, 255);
           break;
         case 1:
-          fill(50, 0, 0);
+          fill(type1);
           break;
         case 2:
-          fill(0, 50, 0);
+          fill(type2);
           break;
         case 3:
-          fill(0, 0, 50);
+          fill(type3);
           break;
         case 4:
-          fill(50, 0, 50);
+          fill(type4);
           break;
       }
       rect(r*cs, 900-c*cs, cs, cs);
       
+      currentBlock.draw();
+      
       stroke(100, 100, 100);
+      noFill();
       rect(r*cs, 900-c*cs, cs, cs);
     }
   }
