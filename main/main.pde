@@ -33,6 +33,17 @@ class Point {
     return oy + y;
   }
   
+  void swap(boolean flip) {
+    int t = x;
+    x = y;
+    y = t;
+    
+    if (flip) {
+      x = -x;
+      y = -y;
+    }
+  }
+  
   boolean canFall() {
     return this.y() != 0 && board[this.x()][this.y()-1] == 0;
   }
@@ -46,12 +57,14 @@ class Piece {
   int x, y;
   Point[] blocks;
   int shape;
+  boolean flip;
   
   Piece(int x, int y, int shape) {
     this.x = x;
     this.y = y;
     this.shape = shape;
     this.blocks = new Point[5];
+    this.flip = false;
     generateBlocks();
   }
   
@@ -117,14 +130,21 @@ class Piece {
     if (willStatic) {
       makeStatic();
       currentBlock = new Piece(3, 15, 2);
-      println("static");
     } else {
       for (Point p : blocks) {
         if (p != null) {
           p.oy--;
         }
       }
-      println("not static");
+    }
+  }
+  
+  void rotate() {
+    flip = !flip;
+    for (Point p : this.blocks) {
+      if (p != null) {
+        p.swap(flip);
+      }
     }
   }
   
@@ -169,9 +189,11 @@ void setup() {
 }
 
 void keyReleased() {
-  if (key == CODED && keyCode == DOWN) {
-    println("hai");
-    currentBlock.fall();
+  if (key == CODED) {
+    if (keyCode == DOWN)
+      currentBlock.fall();
+    else if (keyCode == UP)
+      currentBlock.rotate();
   }
 }
 
