@@ -46,7 +46,7 @@ class Point {
     if (x != 0 || y != 0) {
       println(x, y);
       float angle = atan2(y, x);
-      angle += PI/2;
+      angle -= PI/2;
       x = roundup(cos(angle));
       y = roundup(sin(angle));
       println(cos(angle), sin(angle));
@@ -55,6 +55,14 @@ class Point {
   
   boolean canFall() {
     return this.y() != 0 && board[this.x()][this.y()-1] == 0;
+  }
+  
+  boolean canLeft() {
+    return this.x() != 0 && board[this.x()-1][this.y()] == 0;
+  }
+  
+  boolean canRight() {
+    return (this.x() != board.length-1) && board[this.x()+1][this.y()] == 0;
   }
   
   void draw() {
@@ -127,20 +135,47 @@ class Piece {
   }
   
   void fall() {
-    boolean willStatic = false;
+    boolean canFall = true;
     
-    for (Point p : blocks) {
+    for (Point p : blocks)
       if (p != null && !p.canFall())
-        willStatic = true;
-    }
+        canFall = false;
     
-    if (willStatic) {
-      makeStatic();
-      currentBlock = new Piece(3, 15, 2);
-    } else {
+    if (canFall) {
       for (Point p : blocks)
         if (p != null)
           p.oy--;
+    } else {
+      makeStatic();
+      currentBlock = new Piece(3, 15, 2);
+    }
+  }
+  
+  void left() {
+    boolean canLeft = true;
+    
+    for (Point p : blocks)
+      if (p != null && !p.canLeft())
+        canLeft = false;
+    
+    if (canLeft) {
+      for (Point p : blocks)
+        if (p != null)
+          p.ox--;
+    }
+  }
+  
+  void right() {
+    boolean canRight = true;
+    
+    for (Point p : blocks)
+      if (p != null && !p.canRight())
+        canRight = false;
+    
+    if (canRight) {
+      for (Point p : blocks)
+        if (p != null)
+          p.ox++;
     }
   }
   
@@ -196,6 +231,10 @@ void keyReleased() {
       currentBlock.fall();
     else if (keyCode == UP)
       currentBlock.rotate();
+    else if (keyCode == LEFT)
+      currentBlock.left();
+    else if (keyCode == RIGHT)
+      currentBlock.right();
   }
 }
 
