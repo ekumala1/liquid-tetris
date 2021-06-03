@@ -130,6 +130,30 @@ class Piece {
         board[p.x()][p.y()] = p.type;
   }
   
+  private void goLeft() {
+    for (Point p : blocks)
+      if (p != null)
+        p.ox--;
+  }
+  
+  private void goRight() {
+    for (Point p : blocks)
+      if (p != null)
+        p.ox++;
+}
+
+private void goDown() {
+  for (Point p : blocks)
+    if (p != null)
+      p.oy--;
+}
+
+private void goUp() {
+  for (Point p : blocks)
+    if (p != null)
+      p.oy++;
+}
+  
   void fall() {
     boolean canFall = true;
     
@@ -138,9 +162,7 @@ class Piece {
         canFall = false;
     
     if (canFall) {
-      for (Point p : blocks)
-        if (p != null)
-          p.oy--;
+      goDown();
     } else {
       makeStatic();
       currentBlock = new Piece(3, 15, 2);
@@ -154,11 +176,7 @@ class Piece {
       if (p != null && !p.canLeft())
         canLeft = false;
     
-    if (canLeft) {
-      for (Point p : blocks)
-        if (p != null)
-          p.ox--;
-    }
+    if (canLeft) goLeft();
   }
   
   void right() {
@@ -168,11 +186,7 @@ class Piece {
       if (p != null && !p.canRight())
         canRight = false;
     
-    if (canRight) {
-      for (Point p : blocks)
-        if (p != null)
-          p.ox++;
-    }
+    if (canRight) goRight();
   }
   
   void rotate() {
@@ -180,10 +194,12 @@ class Piece {
       if (p != null) {
         p.rotate();
         
-        if (p.x() < 0) {
-          this.right();
-        } else if (p.x() >= blocks.length)
-          this.left();
+        if (p.x() < 0)
+          goRight();
+        else if (p.x() >= blocks.length)
+          goLeft();
+        else if (board[p.x()][p.y()] != 0)
+          goUp();
       }
     }
   }
