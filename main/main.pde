@@ -52,8 +52,20 @@ class Point {
     }
   }
   
+  void drop() {
+    y--;
+  }
+  
   boolean canFall() {
     return this.y() != 0 && board[this.x()][this.y()-1] == 0;
+  }
+  
+  boolean canFlowLeft() {
+    return this.y() != 0 && board[this.x()-1][this.y()-1] == 0;
+  }
+  
+  boolean canFlowRight() {
+    return this.y() != 0 && board[this.x()+1][this.y()-1] == 0;
   }
   
   boolean canLeft() {
@@ -72,10 +84,14 @@ class Point {
 class Piece {
   Point[] blocks;
   int shape;
+  boolean grounded;
+  boolean fixed;
   
   Piece(int x, int y, int shape) {
     this.shape = shape;
     this.blocks = new Point[5];
+    this.grounded = false;
+    this.fixed = false;
     generateBlocks(x, y);
   }
   
@@ -155,14 +171,25 @@ class Piece {
   }
   
   void fall() {
-    boolean canFall = true;
-    
-    for (Point p : blocks)
-      if (p != null && !p.canFall())
-        canFall = false;
-    
-    if (canFall) {
+    boolean stuck = true;
+    if (!grounded) {
       goDown();
+      
+      for (Point p : blocks) {
+        if (p != null && !p.canFall())
+          grounded = true;
+        if (p != null && p.canFall())
+          fixed = false;
+      }
+    } else if (!fixed) {
+      println("not fixed");
+      for (Point p : blocks) {
+        if (p != null && p.canFall()) {
+          stuck = false;
+          p.drop();
+        }
+      }
+      fixed = stuck;
     } else {
       makeStatic();
       generatePiece();
