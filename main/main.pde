@@ -58,6 +58,16 @@ class Point implements Comparable<Point> {
     y--;
   }
   
+  void flowLeft() {
+    x--;
+    y--;
+  }
+  
+  void flowRight() {
+    x++;
+    y--;
+  }
+  
   void fix() {
     board[x()][y()] = type;
   }
@@ -172,8 +182,14 @@ class Piece {
   
   private void goDownIndividual() {
     for (Point p : blocks)
-      if (p != null && p.canFall())
-        p.drop();
+      if (p != null) {
+        if (p.canFall())
+          p.drop();
+        else if (p.canFlowLeft())
+          p.flowLeft();
+        else if (p.canFlowRight())
+          p.flowRight();
+      }
   }
   
   private void goUp() {
@@ -187,7 +203,7 @@ class Piece {
     Arrays.sort(blocks);
     
     for (Point p : blocks)
-      if (!p.canFall())
+      if (!p.canFall() && !p.canFlowLeft() && !p.canFlowRight())
         p.fix();
   }
   
@@ -199,7 +215,7 @@ class Piece {
       for (Point p : blocks) {
         if (p != null && !p.canFall())
           grounded = true;
-        if (p != null && p.canFall())
+        if (p != null && (p.canFall() || p.canFlowLeft() || p.canFlowRight()))
           fullyGrounded = false;
       }
     } else if (!fullyGrounded) {
@@ -208,7 +224,7 @@ class Piece {
       
       boolean stuck = true;
       for (Point p : blocks)
-        if (p != null && p.canFall())
+        if (p != null && (p.canFall() || p.canFlowLeft() || p.canFlowRight()))
           stuck = false;
       
       fullyGrounded = stuck;
@@ -317,7 +333,7 @@ void draw() {
   background(255, 255, 255);
   
   if (millis() - time > 500) {
-    //currentBlock.fall();
+    currentBlock.fall();
     time = millis();
   }
       
