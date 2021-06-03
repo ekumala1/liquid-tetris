@@ -11,6 +11,7 @@ color type4 = color(75, 0, 75);
 
 int cs = cellsize;
 Piece currentBlock;
+int time;
 
 class Point {
   int ox, oy;
@@ -44,12 +45,10 @@ class Point {
   
   void rotate() {
     if (x != 0 || y != 0) {
-      println(x, y);
       float angle = atan2(y, x);
       angle -= PI/2;
       x = roundup(cos(angle));
       y = roundup(sin(angle));
-      println(cos(angle), sin(angle));
     }
   }
   
@@ -71,59 +70,56 @@ class Point {
 }
 
 class Piece {
-  int x, y;
   Point[] blocks;
   int shape;
   
   Piece(int x, int y, int shape) {
-    this.x = x;
-    this.y = y;
     this.shape = shape;
     this.blocks = new Point[5];
-    generateBlocks();
+    generateBlocks(x, y);
   }
   
-  private void makeT() {
-    this.blocks[0] = new Point(this.x, this.y, -1, 0, 1);
-    this.blocks[1] = new Point(this.x, this.y, 1, 0, 1);
-    this.blocks[2] = new Point(this.x, this.y, 0, 0, 1);
-    this.blocks[3] = new Point(this.x, this.y, 0, 1, 1);
+  private void makeT(int x, int y) {
+    this.blocks[0] = new Point(x, y, -1, 0, shape);
+    this.blocks[1] = new Point(x, y, 1, 0, shape);
+    this.blocks[2] = new Point(x, y, 0, 0, shape);
+    this.blocks[3] = new Point(x, y, 0, 1, shape);
   }
   
-  private void makeL1() {
-    this.blocks[0] = new Point(this.x, this.y, -1, 1, 1);
-    this.blocks[1] = new Point(this.x, this.y, 0, 1, 1);
-    this.blocks[2] = new Point(this.x, this.y, 0, 0, 1);
-    this.blocks[3] = new Point(this.x, this.y, 0, -1, 1);
+  private void makeL1(int x, int y) {
+    this.blocks[0] = new Point(x, y, -1, 1, shape);
+    this.blocks[1] = new Point(x, y, 0, 1, shape);
+    this.blocks[2] = new Point(x, y, 0, 0, shape);
+    this.blocks[3] = new Point(x, y, 0, -1, shape);
   }
   
-  private void makeL2() {
-    this.blocks[0] = new Point(this.x, this.y, 1, 1, 1);
-    this.blocks[1] = new Point(this.x, this.y, 0, 1, 1);
-    this.blocks[2] = new Point(this.x, this.y, 0, 0, 1);
-    this.blocks[3] = new Point(this.x, this.y, 0, -1, 1);
+  private void makeL2(int x, int y) {
+    this.blocks[0] = new Point(x, y, 1, 1, shape);
+    this.blocks[1] = new Point(x, y, 0, 1, shape);
+    this.blocks[2] = new Point(x, y, 0, 0, shape);
+    this.blocks[3] = new Point(x, y, 0, -1, shape);
   }
   
-  private void makeBox() {
-    this.blocks[0] = new Point(this.x, this.y, -1, 1, 1);
-    this.blocks[1] = new Point(this.x, this.y, 1, 1, 1);
-    this.blocks[2] = new Point(this.x, this.y, -1, -1, 1);
-    this.blocks[3] = new Point(this.x, this.y, 1, -1, 1);
+  private void makeBox(int x, int y) {
+    this.blocks[0] = new Point(x, y, -1, 1, shape);
+    this.blocks[1] = new Point(x, y, 1, 1, shape);
+    this.blocks[2] = new Point(x, y, -1, -1, shape);
+    this.blocks[3] = new Point(x, y, 1, -1, shape);
   }
   
-  private void generateBlocks() {
+  private void generateBlocks(int x, int y) {
     switch (this.shape) {
       case 1:
-        makeT();
+        makeT(x, y);
         break;
       case 2:
-        makeL1();
+        makeL1(x, y);
         break;
       case 3:
-        makeL2();
+        makeL2(x, y);
         break;
       case 4:
-        makeBox();
+        makeBox(x, y);
         break;
     }
   }
@@ -180,9 +176,16 @@ class Piece {
   }
   
   void rotate() {
-    for (Point p : this.blocks)
-      if (p != null)
+    for (Point p : this.blocks) {
+      if (p != null) {
         p.rotate();
+        
+        if (p.x() < 0) {
+          this.right();
+        } else if (p.x() >= blocks.length)
+          this.left();
+      }
+    }
   }
   
   void draw() {
@@ -223,6 +226,7 @@ void setup() {
   }
   
   currentBlock = new Piece(3, 15, 2);
+  time = millis();
 }
 
 void keyReleased() {
@@ -240,6 +244,11 @@ void keyReleased() {
 
 void draw() {
   background(255, 255, 255);
+  
+  if (millis() - time > 500) {
+    currentBlock.fall();
+    time = millis();
+  }
   
   for (int r=0; r<board.length; r++) {
     for (int c=0; c<board[r].length; c++) {
