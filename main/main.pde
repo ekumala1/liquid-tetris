@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 //-----------------------------------------------
 //GAME VARIABLES
 //-----------------------------------------------
@@ -13,7 +15,7 @@ int cs = cellsize;
 Piece currentBlock;
 int time;
 
-class Point {
+class Point implements Comparable<Point> {
   int ox, oy;
   private int x, y;
   int type;
@@ -56,6 +58,10 @@ class Point {
     y--;
   }
   
+  void fix() {
+    board[x()][y()] = type;
+  }
+  
   boolean canFall() {
     return this.y() != 0 && board[this.x()][this.y()-1] == 0;
   }
@@ -79,19 +85,23 @@ class Point {
   void draw() {
     rect(this.x()*cs, 900-this.y()*cs, cs, cs);
   }
+  
+  int compareTo(Point p) {
+    return this.y - p.y;
+  }
 }
 
 class Piece {
   Point[] blocks;
   int shape;
   boolean grounded;
-  boolean fixed;
+  boolean fullyGrounded;
   
   Piece(int x, int y, int shape) {
     this.shape = shape;
-    this.blocks = new Point[5];
+    this.blocks = new Point[4];
     this.grounded = false;
-    this.fixed = false;
+    this.fullyGrounded = false;
     generateBlocks(x, y);
   }
   
@@ -139,12 +149,6 @@ class Piece {
         break;
     }
   }
-    
-  private void makeStatic() {
-    for (Point p : blocks)
-      if (p != null)
-        board[p.x()][p.y()] = p.type;
-  }
   
   private void goLeft() {
     for (Point p : blocks)
@@ -159,9 +163,10 @@ class Piece {
   }
   
   private void goDown() {
-    for (Point p : blocks)
+    for (Point p : blocks) {
       if (p != null)
         p.oy--;
+    }
   }
   
   private void goUp() {
@@ -170,28 +175,39 @@ class Piece {
         p.oy++;
   }
   
+  private void reevaluateGrounding() {
+    // sort blocks
+    Arrays.sort(blocks);
+    
+    for (Point p : blocks)
+      if (!p.canFall())
+        p.fix();
+  }
+  
   void fall() {
-    boolean stuck = true;
     if (!grounded) {
       goDown();
+      fullyGrounded = true;
       
       for (Point p : blocks) {
         if (p != null && !p.canFall())
           grounded = true;
         if (p != null && p.canFall())
-          fixed = false;
+          fullyGrounded = false;
       }
-    } else if (!fixed) {
-      println("not fixed");
+    } else if (!fullyGrounded) {
+      boolean stuck = true;
+      
+      reevaluateGrounding();
       for (Point p : blocks) {
         if (p != null && p.canFall()) {
-          stuck = false;
           p.drop();
+          stuck = false;
         }
       }
-      fixed = stuck;
+      
+      fullyGrounded = stuck;
     } else {
-      makeStatic();
       generatePiece();
     }
   }
@@ -218,17 +234,18 @@ class Piece {
   
   void rotate() {
     if (shape == 4) return;
-    
-    for (Point p : blocks) {
-      if (p != null) {
-        p.rotate();
-        
-        if (p.x() < 0)
-          goRight();
-        else if (p.x() >= board.length)
-          goLeft();
-        else if (board[p.x()][p.y()] != 0)
-          goUp();
+    if (!grounded) {
+      for (Point p : blocks) {
+        if (p != null) {
+          p.rotate();
+          
+          if (p.x() < 0)
+            goRight();
+          else if (p.x() >= board.length)
+            goLeft();
+          else if (board[p.x()][p.y()] != 0)
+            goUp();
+        }
       }
     }
   }
@@ -295,35 +312,35 @@ void draw() {
   background(255, 255, 255);
   
   if (millis() - time > 500) {
-    currentBlock.fall();
+    //currentBlock.fall();
     time = millis();
   }
+      
+  currentBlock.draw();
   
   for (int r=0; r<board.length; r++) {
     for (int c=0; c<board[r].length; c++) {
       noStroke();
       switch (board[r][c]) {
         case 0:
-          fill(255, 255, 255);
+          noFill();
           break;
         case 1:
-          fill(type1);
+          fill(255,0,0);
           break;
         case 2:
-          fill(type2);
+          fill(0,255,0);
           break;
         case 3:
-          fill(type3);
+          fill(0,0,255);
           break;
         case 4:
-          fill(type4);
+          fill(255,0,255);
           break;
       }
       rect(r*cs, 900-c*cs, cs, cs);
     }
   }
-      
-  currentBlock.draw();
   
   for (int r=0; r<board.length; r++) {
     for (int c=0; c<board[r].length; c++) {
