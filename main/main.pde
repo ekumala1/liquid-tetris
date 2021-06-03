@@ -99,6 +99,10 @@ class Point implements Comparable<Point> {
   int compareTo(Point p) {
     return this.y - p.y;
   }
+  
+  String toString() {
+    return String.format("%d, %d", x(), y());
+  }
 }
 
 class Piece {
@@ -183,9 +187,24 @@ class Piece {
   private void goDownIndividual() {
     for (Point p : blocks)
       if (p != null) {
-        if (p.canFall())
-          p.drop();
-        else if (p.canFlowLeft())
+        if (p.canFall()) {
+          boolean canDrop = true;
+          println(blocks);
+          for (Point p2 : blocks) {
+            if (p2.x() == p.x()-1 && p2.y() == p.y()) {
+              if (!p2.canFall() && !p2.canFlowLeft())
+                canDrop = false;
+            } else if (p2.x() == p.x()+1 && p2.y() == p.y()) {
+              if (!p2.canFall())
+                canDrop = false;
+            } else if (p2.x() == p.x() && p2.y() == p.y()-1) {
+              canDrop = false;
+            }
+          }
+          
+          if (canDrop)
+            p.drop();
+        } else if (p.canFlowLeft())
           p.flowLeft();
         else if (p.canFlowRight())
           p.flowRight();
@@ -298,6 +317,7 @@ class Piece {
 
 void generatePiece() {
   currentBlock = new Piece(5, 17, (int)random(4)+1);
+  //currentBlock = new Piece(5, 17, 1);
 }
 
 void setup() {
@@ -333,7 +353,7 @@ void draw() {
   background(255, 255, 255);
   
   if (millis() - time > 500) {
-    //currentBlock.fall();
+    currentBlock.fall();
     time = millis();
   }
       

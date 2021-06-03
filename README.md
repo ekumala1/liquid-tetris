@@ -5,4 +5,5 @@
 - 12:15AM, figured out need to make a full function to redetermine grounding of every point that forms it into background
 - 12:45AM, reevalute grounding finally works but it's one frame late
 
-- 1:05, tried to add liquid flowing and mostly works but some blocks are eaten up
+- 1:05AM, tried to add liquid flowing and mostly works but some blocks are eaten up
+- 3:04AM, figured out if a block is going down, i just need to check all its neighbors to see if they are planning to go into my spot and if so then stall
