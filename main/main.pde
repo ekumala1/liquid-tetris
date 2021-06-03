@@ -137,6 +137,20 @@ class Piece {
     generateBlocks(x, y);
   }
   
+  private void makeS(int x, int y) {
+    this.blocks[0] = new Point(x, y, -1, 0, shape);
+    this.blocks[1] = new Point(x, y, 0, 0, shape);
+    this.blocks[2] = new Point(x, y, 0, 1, shape);
+    this.blocks[3] = new Point(x, y, 1, 1, shape);
+  }
+  
+  private void makeZ(int x, int y) {
+    this.blocks[0] = new Point(x, y, -1, 1, shape);
+    this.blocks[1] = new Point(x, y, 0, 1, shape);
+    this.blocks[2] = new Point(x, y, 0, 0, shape);
+    this.blocks[3] = new Point(x, y, 1, 0, shape);
+  }
+  
   private void makeT(int x, int y) {
     this.blocks[0] = new Point(x, y, -1, 0, shape);
     this.blocks[1] = new Point(x, y, 1, 0, shape);
@@ -144,40 +158,53 @@ class Piece {
     this.blocks[3] = new Point(x, y, 0, 1, shape);
   }
   
-  private void makeL1(int x, int y) {
+  private void makeL(int x, int y) {
     this.blocks[0] = new Point(x, y, -1, 1, shape);
     this.blocks[1] = new Point(x, y, 0, 1, shape);
     this.blocks[2] = new Point(x, y, 0, 0, shape);
     this.blocks[3] = new Point(x, y, 0, -1, shape);
   }
   
-  private void makeL2(int x, int y) {
+  private void makeJ(int x, int y) {
     this.blocks[0] = new Point(x, y, 1, 1, shape);
     this.blocks[1] = new Point(x, y, 0, 1, shape);
     this.blocks[2] = new Point(x, y, 0, 0, shape);
     this.blocks[3] = new Point(x, y, 0, -1, shape);
   }
   
-  private void makeBox(int x, int y) {
+  private void makeO(int x, int y) {
     this.blocks[0] = new Point(x, y, -1, -1, shape);
     this.blocks[1] = new Point(x, y, -1, 0, shape);
     this.blocks[2] = new Point(x, y, 0, -1, shape);
     this.blocks[3] = new Point(x, y, 0, 0, shape);
   }
   
+  private void makeI(int x, int y) {
+    this.blocks[0] = new Point(x, y, 0, -2, shape);
+    this.blocks[1] = new Point(x, y, 0, -1, shape);
+    this.blocks[2] = new Point(x, y, 0, 0, shape);
+    this.blocks[3] = new Point(x, y, 0, 1, shape);
+  }
+  
   private void generateBlocks(int x, int y) {
     switch (this.shape) {
       case 1:
-        makeT(x, y);
+        makeS(x, y);
         break;
       case 2:
-        makeL1(x, y);
+        makeZ(x, y);
         break;
       case 3:
-        makeL2(x, y);
+        makeT(x, y);
         break;
       case 4:
-        makeBox(x, y);
+        makeL(x, y);
+      case 5:
+        makeJ(x, y);
+      case 6:
+        makeO(x, y);
+      case 7:
+        makeI(x, y);
         break;
     }
   }
@@ -292,7 +319,7 @@ class Piece {
   }
   
   void rotate() {
-    if (shape == 4) return;
+    if (shape == 6) return;
     if (!grounded) {
       for (Point p : blocks) {
         if (p != null) {
@@ -325,6 +352,12 @@ class Piece {
         break;
       case 4:
         fill(type4);
+      case 5:
+        fill(type4);
+      case 6:
+        fill(type4);
+      case 7:
+        fill(type4);
         break;
     }
     for (Point block : blocks) {
@@ -335,7 +368,7 @@ class Piece {
 }
 
 void generatePiece() {
-  currentBlock = new Piece(5, 17, (int)random(4)+1);
+  currentBlock = new Piece(5, 17, (int)random(7)+1);
   //currentBlock = new Piece(5, 17, 1);
 }
 
@@ -394,7 +427,7 @@ void draw() {
     exit();
   }
   
-  if (millis() - time > 10) {
+  if (millis() - time > 500) {
     currentBlock.fall();
     time = millis();
   }
