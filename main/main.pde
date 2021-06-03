@@ -77,11 +77,11 @@ class Point implements Comparable<Point> {
   }
   
   boolean canFlowLeft() {
-    return this.y() != 0 && board[this.x()-1][this.y()-1] == 0;
+    return this.x() != 0 && this.y() != 0 && board[this.x()-1][this.y()-1] == 0;
   }
   
   boolean canFlowRight() {
-    return this.y() != 0 && board[this.x()+1][this.y()-1] == 0;
+    return (this.x() != board.length-1) && this.y() != 0 && board[this.x()+1][this.y()-1] == 0;
   }
   
   boolean canLeft() {
@@ -333,7 +333,7 @@ void draw() {
   background(255, 255, 255);
   
   if (millis() - time > 500) {
-    currentBlock.fall();
+    //currentBlock.fall();
     time = millis();
   }
       
