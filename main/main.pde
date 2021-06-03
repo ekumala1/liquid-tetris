@@ -101,10 +101,10 @@ class Piece {
   }
   
   private void makeBox(int x, int y) {
-    this.blocks[0] = new Point(x, y, -1, 1, shape);
-    this.blocks[1] = new Point(x, y, 1, 1, shape);
-    this.blocks[2] = new Point(x, y, -1, -1, shape);
-    this.blocks[3] = new Point(x, y, 1, -1, shape);
+    this.blocks[0] = new Point(x, y, -1, -1, shape);
+    this.blocks[1] = new Point(x, y, -1, 0, shape);
+    this.blocks[2] = new Point(x, y, 0, -1, shape);
+    this.blocks[3] = new Point(x, y, 0, 0, shape);
   }
   
   private void generateBlocks(int x, int y) {
@@ -165,7 +165,7 @@ class Piece {
       goDown();
     } else {
       makeStatic();
-      currentBlock = new Piece(3, 15, 2);
+      generatePiece();
     }
   }
   
@@ -190,13 +190,15 @@ class Piece {
   }
   
   void rotate() {
-    for (Point p : this.blocks) {
+    if (shape == 4) return;
+    
+    for (Point p : blocks) {
       if (p != null) {
         p.rotate();
         
         if (p.x() < 0)
           goRight();
-        else if (p.x() >= blocks.length)
+        else if (p.x() >= board.length)
           goLeft();
         else if (board[p.x()][p.y()] != 0)
           goUp();
@@ -229,6 +231,10 @@ class Piece {
   }
 }
 
+void generatePiece() {
+  currentBlock = new Piece(5, 17, (int)random(4)+1);
+}
+
 void setup() {
   size(1000, 1000);
   //for (int r=0; r<board.length; r++) {
@@ -241,7 +247,7 @@ void setup() {
     board[c][0] = 1;
   }
   
-  currentBlock = new Piece(3, 15, 2);
+  generatePiece();
   time = millis();
 }
 
