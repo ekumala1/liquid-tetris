@@ -3,7 +3,7 @@ import java.util.Arrays;
 //-----------------------------------------------
 //GAME VARIABLES
 //-----------------------------------------------
-int[][] board = new int[10][20];
+int[][] board = new int[20][10];
 int cellsize = 40;
 color type1 = color(75, 0, 0);
 color type2 = color(0, 75, 0);
@@ -13,7 +13,8 @@ color type4 = color(75, 0, 75);
 
 int cs = cellsize;
 Piece currentBlock;
-int time;
+long time;
+int piecesFixed = 0;
 
 class Point implements Comparable<Point> {
   int ox, oy;
@@ -69,27 +70,44 @@ class Point implements Comparable<Point> {
   }
   
   void fix() {
-    board[x()][y()] = type;
+    println();
+    for (int r=0; r<board.length; r++) {
+      for (int c=0; c<board[r].length; c++) {
+        print(board[r][c]);
+      }
+      println();
+    }
+    
+    board[y()][x()] = type;
+    
+    println("fixed", this);
+    for (int r=0; r<board.length; r++) {
+      for (int c=0; c<board[r].length; c++) {
+        print(board[r][c]);
+      }
+      println();
+    }
+    println();
   }
   
   boolean canFall() {
-    return this.y() != 0 && board[this.x()][this.y()-1] == 0;
+    return this.y() != 0 && board[this.y()-1][this.x()] == 0;
   }
   
   boolean canFlowLeft() {
-    return this.x() != 0 && this.y() != 0 && board[this.x()-1][this.y()-1] == 0;
+    return this.x() != 0 && this.y() != 0 && board[this.y()-1][this.x()-1] == 0;
   }
   
   boolean canFlowRight() {
-    return (this.x() != board.length-1) && this.y() != 0 && board[this.x()+1][this.y()-1] == 0;
+    return (this.x() != board[0].length-1) && this.y() != 0 && board[this.y()-1][this.x()+1] == 0;
   }
   
   boolean canLeft() {
-    return this.x() != 0 && board[this.x()-1][this.y()] == 0;
+    return this.x() != 0 && board[this.y()][this.x()-1] == 0;
   }
   
   boolean canRight() {
-    return (this.x() != board.length-1) && board[this.x()+1][this.y()] == 0;
+    return (this.x() != board[0].length-1) && board[this.y()][this.x()+1] == 0;
   }
   
   void draw() {
@@ -189,7 +207,6 @@ class Piece {
       if (p != null) {
         if (p.canFall()) {
           boolean canDrop = true;
-          println(blocks);
           for (Point p2 : blocks) {
             if (p2.x() == p.x()-1 && p2.y() == p.y()) {
               if (!p2.canFall() && !p2.canFlowLeft())
@@ -248,7 +265,9 @@ class Piece {
       
       fullyGrounded = stuck;
     } else {
+      clearBoard();
       generatePiece();
+      piecesFixed++;
     }
   }
   
@@ -281,9 +300,9 @@ class Piece {
           
           if (p.x() < 0)
             goRight();
-          else if (p.x() >= board.length)
+          else if (p.x() >= board[0].length)
             goLeft();
-          else if (board[p.x()][p.y()] != 0)
+          else if (board[p.y()][p.x()] != 0)
             goUp();
         }
       }
@@ -320,16 +339,35 @@ void generatePiece() {
   //currentBlock = new Piece(5, 17, 1);
 }
 
+void shiftDown(int i) {
+  for (int r=i; r<board.length-1; r++) {
+    board[r] = board[r+1];
+  }
+}
+
+void clearBoard() {
+  boolean clear;
+  for (int r=0; r<board.length; r++) {
+    clear = true;
+    for (int c=0; c<board[r].length; c++) {
+      if (board[r][c] == 0)
+        clear = false;
+    }
+    if (clear)
+      shiftDown(r);
+  }
+}
+
 void setup() {
   size(1000, 1000);
   //for (int r=0; r<board.length; r++) {
-  //  for (int c=0; c<board[r].length; c++) {
+  //  for (int c=0; c<board[c].length; c++) {
   //    board[r][c] = (int)random(5);
   //  }
   //}
   
-  for (int c=0; c<board.length; c++) {
-    board[c][0] = 1;
+  for (int c=0; c<board[0].length; c++) {
+    board[0][c] = 1;
   }
   
   generatePiece();
@@ -352,15 +390,19 @@ void keyReleased() {
 void draw() {
   background(255, 255, 255);
   
-  if (millis() - time > 500) {
+  if (board[10][5] != 0) {
+    exit();
+  }
+  
+  if (millis() - time > 10) {
     currentBlock.fall();
     time = millis();
   }
-      
+  
   currentBlock.draw();
   
   for (int r=0; r<board.length; r++) {
-    for (int c=0; c<board[r].length; c++) {
+    for (int c=0; c<board[0].length; c++) {
       noStroke();
       switch (board[r][c]) {
         case 0:
@@ -379,15 +421,15 @@ void draw() {
           fill(255,0,255);
           break;
       }
-      rect(r*cs, 900-c*cs, cs, cs);
+      rect(c*cs, 900-r*cs, cs, cs);
     }
   }
   
   for (int r=0; r<board.length; r++) {
-    for (int c=0; c<board[r].length; c++) {
+    for (int c=0; c<board[0].length; c++) {
       stroke(100, 100, 100);
       noFill();
-      rect(r*cs, 900-c*cs, cs, cs);
+      rect(c*cs, 900-r*cs, cs, cs);
     }
   }
 }
