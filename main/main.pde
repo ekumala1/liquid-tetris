@@ -163,10 +163,17 @@ class Piece {
   }
   
   private void goDown() {
-    for (Point p : blocks) {
+    for (Point p : blocks)
       if (p != null)
         p.oy--;
-    }
+    
+    reevaluateGrounding();
+  }
+  
+  private void goDownIndividual() {
+    for (Point p : blocks)
+      if (p != null && p.canFall())
+        p.drop();
   }
   
   private void goUp() {
@@ -196,15 +203,13 @@ class Piece {
           fullyGrounded = false;
       }
     } else if (!fullyGrounded) {
-      boolean stuck = true;
-      
+      goDownIndividual();
       reevaluateGrounding();
-      for (Point p : blocks) {
-        if (p != null && p.canFall()) {
-          p.drop();
+      
+      boolean stuck = true;
+      for (Point p : blocks)
+        if (p != null && p.canFall())
           stuck = false;
-        }
-      }
       
       fullyGrounded = stuck;
     } else {
