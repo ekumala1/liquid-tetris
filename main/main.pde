@@ -33,14 +33,23 @@ class Point {
     return oy + y;
   }
   
-  void swap(boolean flip) {
-    int t = x;
-    x = y;
-    y = t;
-    
-    if (flip) {
-      x = -x;
-      y = -y;
+  private int roundup(float f) {
+    if (f > .001)
+      return 1;
+    else if (f < -.001)
+      return -1;
+    else
+      return 0;
+  }
+  
+  void rotate() {
+    if (x != 0 || y != 0) {
+      println(x, y);
+      float angle = atan2(y, x);
+      angle += PI/2;
+      x = roundup(cos(angle));
+      y = roundup(sin(angle));
+      println(cos(angle), sin(angle));
     }
   }
   
@@ -57,14 +66,12 @@ class Piece {
   int x, y;
   Point[] blocks;
   int shape;
-  boolean flip;
   
   Piece(int x, int y, int shape) {
     this.x = x;
     this.y = y;
     this.shape = shape;
     this.blocks = new Point[5];
-    this.flip = false;
     generateBlocks();
   }
   
@@ -131,21 +138,16 @@ class Piece {
       makeStatic();
       currentBlock = new Piece(3, 15, 2);
     } else {
-      for (Point p : blocks) {
-        if (p != null) {
+      for (Point p : blocks)
+        if (p != null)
           p.oy--;
-        }
-      }
     }
   }
   
   void rotate() {
-    flip = !flip;
-    for (Point p : this.blocks) {
-      if (p != null) {
-        p.swap(flip);
-      }
-    }
+    for (Point p : this.blocks)
+      if (p != null)
+        p.rotate();
   }
   
   void draw() {
