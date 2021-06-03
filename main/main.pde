@@ -140,19 +140,19 @@ class Piece {
     for (Point p : blocks)
       if (p != null)
         p.ox++;
-}
-
-private void goDown() {
-  for (Point p : blocks)
-    if (p != null)
-      p.oy--;
-}
-
-private void goUp() {
-  for (Point p : blocks)
-    if (p != null)
-      p.oy++;
-}
+  }
+  
+  private void goDown() {
+    for (Point p : blocks)
+      if (p != null)
+        p.oy--;
+  }
+  
+  private void goUp() {
+    for (Point p : blocks)
+      if (p != null)
+        p.oy++;
+  }
   
   void fall() {
     boolean canFall = true;
